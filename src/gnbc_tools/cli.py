@@ -135,14 +135,19 @@ def pr():
         if assignment_dir.exists():
             assignees = [d.name for d in get_instructor_dirs(assignment_dir, ldac)]
 
+    if not assignees:
+        typer.echo("警告: 講師ディレクトリが見つかりませんでした。assigneesを指定せずにPRページを開きます", err=True)
+
     encoded_branch = quote(current_branch, safe="")
     encoded_title = quote(pr_title, safe="")
-    encoded_assignees = quote(",".join(assignees), safe="")
+
+    query = f"quick_pull=1&title={encoded_title}"
+    if assignees:
+        query += f"&assignees={quote(','.join(assignees), safe='')}"
 
     url = (
         f"https://github.com/{GITHUB_REPO}/compare/"
-        f"{encoded_branch}...main"
-        f"?quick_pull=1&title={encoded_title}&assignees={encoded_assignees}"
+        f"{encoded_branch}...main?{query}"
     )
 
     webbrowser.open(url)
