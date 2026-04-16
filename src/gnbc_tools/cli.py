@@ -141,13 +141,13 @@ def pr():
     encoded_branch = quote(current_branch, safe="")
     encoded_title = quote(pr_title, safe="")
 
-    query = f"quick_pull=1&title={encoded_title}"
+    query = f"quick_pull=1&title={encoded_title}&draft=true"
     if assignees:
         query += f"&assignees={quote(','.join(assignees), safe='')}"
 
     url = (
         f"https://github.com/{GITHUB_REPO}/compare/"
-        f"{encoded_branch}...main?{query}"
+        f"main...{encoded_branch}?{query}"
     )
 
     webbrowser.open(url)

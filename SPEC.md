@@ -11,7 +11,7 @@
   複数候補がある場合は`questionary`でユーザーに選択させる。1つも候補がない場合はエラー終了する
 - PR作成
   以下をブラウザーで開く
-  `https://github.com/geniee-inc/bootcamp-workshop2026/compare/<ブランチ名>...main?quick_pull=1&title=<PRタイトル>&assignees=<asignees>`
+  `https://github.com/geniee-inc/bootcamp-workshop2026/compare/main...<ブランチ名>?quick_pull=1&title=<PRタイトル>&assignees=<asignees>&draft=true`
   - ブランチ名: 現在のブランチ
   - PRタイトル: `MMdd_講義名/LDAC名` ブランチ名と同じ
   - asignees: 講師名 `bootcamp用リポジトリ/MMdd_講義名/`にあるディレクトリのうち、LDAC名と違うものを講師名と推測する。候補がない場合は警告を出すとともに、asigneesを指定せずにURLを開く
