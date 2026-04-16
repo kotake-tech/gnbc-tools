@@ -11,7 +11,24 @@ import typer
 
 app = typer.Typer(help="GENIEEのbootcampで使う便利ツール")
 
-GITHUB_REPO = "geniee-inc/bootcamp-workshop2026"
+
+def get_github_repo() -> str:
+    """git remote originのURLから owner/repo 形式を取得する"""
+    url = subprocess.check_output(
+        ["git", "config", "--get", "remote.origin.url"], text=True
+    ).strip()
+
+    if url.endswith(".git"):
+        url = url[:-4]
+
+    if url.startswith("https://github.com/"):
+        return url.replace("https://github.com/", "")
+    elif url.startswith("http://github.com/"):
+        return url.replace("http://github.com/", "")
+    elif url.startswith("git@github.com:"):
+        return url.replace("git@github.com:", "")
+    else:
+        raise ValueError(f"Unsupported GitHub URL format: {url}")
 
 
 def get_ldac_name() -> str:
@@ -145,8 +162,9 @@ def pr():
     if assignees:
         query += f"&assignees={quote(','.join(assignees), safe='')}"
 
+    github_repo = get_github_repo()
     url = (
-        f"https://github.com/{GITHUB_REPO}/compare/"
+        f"https://github.com/{github_repo}/compare/"
         f"main...{encoded_branch}?{query}"
     )
 
