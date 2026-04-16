@@ -67,6 +67,17 @@ def branch():
     root = Path.cwd()
     ldac = get_ldac_name()
 
+    current_branch = get_current_branch()
+    if current_branch != "main":
+        typer.echo(
+            f"警告: 現在のブランチは '{current_branch}' です。"
+            " main に checkout して pull することを推奨します。",
+            err=True,
+        )
+        proceed = questionary.confirm("このまま続行しますか?", default=False).ask()
+        if not proceed:
+            raise typer.Exit(0)
+
     assignments = get_assignments(root)
     if not assignments:
         typer.echo("課題ディレクトリが見つかりませんでした")
