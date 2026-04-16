@@ -27,3 +27,7 @@ uv tool install git+https://github.com/kotake-tech/gnbc-tools
   ```sh
   gnbc pr
   ```
+
+## 仕様
+
+[SPEC.md](./SPEC.md)
