@@ -22,6 +22,9 @@ uv tool install git+https://github.com/kotake-tech/gnbc-tools
 
 ## 使用方法
 
+> [!note]
+> 以下のコマンドはbootcampのリポジトリのルートディレクトリで実行してください。
+
 - 課題のブランチを作成する
   ```sh
   gnbc branch
