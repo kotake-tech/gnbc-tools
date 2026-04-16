@@ -6,6 +6,13 @@ GENIEEのbootcampで使う便利ツール
 
 - MacまたはLinux
 - [uv](https://docs.astral.sh/uv/) がインストールされている
+  ```sh
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  ```
+  or
+  ```
+  brew install uv
+  ```
 
 ## インストール
 
