@@ -23,7 +23,7 @@ uv tool install git+https://github.com/kotake-tech/gnbc-tools
   ```sh
   gnbc copy
   ```
-- PR作成
+- PRを作成する
   ```sh
   gnbc pr
   ```
