@@ -41,6 +41,15 @@ def get_current_branch() -> str:
     ).strip()
 
 
+def get_repo_root() -> Path:
+    """Gitリポジトリのルートディレクトリを取得する"""
+    return Path(
+        subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"], text=True
+        ).strip()
+    )
+
+
 def get_assignments(root: Path) -> list[str]:
     """MMdd_講義名 パターンのディレクトリを取得し、今日の日付で絞り込む。"""
     today = date.today()
@@ -64,7 +73,7 @@ def get_instructor_dirs(assignment_dir: Path, ldac: str) -> list[Path]:
 @app.command()
 def branch():
     """課題のブランチを作成する"""
-    root = Path.cwd()
+    root = get_repo_root()
     ldac = get_ldac_name()
 
     current_branch = get_current_branch()
@@ -99,7 +108,7 @@ def branch():
 @app.command()
 def copy():
     """テンプレをコピーする"""
-    root = Path.cwd()
+    root = get_repo_root()
     ldac = get_ldac_name()
 
     current_branch = get_current_branch()
@@ -150,7 +159,7 @@ def copy():
 @app.command()
 def pr():
     """PRを作成する"""
-    root = Path.cwd()
+    root = get_repo_root()
     ldac = get_ldac_name()
 
     current_branch = get_current_branch()
