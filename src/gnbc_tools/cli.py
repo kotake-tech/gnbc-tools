@@ -1,3 +1,4 @@
+import os
 import re
 import shutil
 import subprocess
@@ -103,6 +104,37 @@ def branch():
     branch_name = f"{assignment}/{ldac}"
     subprocess.run(["git", "checkout", "-b", branch_name], check=True)
     typer.echo(f"ブランチ '{branch_name}' を作成しました")
+
+
+@app.command()
+def cd():
+    """課題のディレクトリに移動する (使用方法: gnbc cd)"""
+    root = get_repo_root()
+    ldac = get_ldac_name()
+
+    current_branch = get_current_branch()
+    if "/" in current_branch:
+        assignment = current_branch.rsplit("/", 1)[0]
+    else:
+        assignments = get_assignments(root)
+        if not assignments:
+            typer.echo("課題ディレクトリが見つかりませんでした", err=True)
+            raise typer.Exit(1)
+        assignment = questionary.select(
+            "課題を選択してください:",
+            choices=assignments,
+        ).ask()
+        if assignment is None:
+            raise typer.Exit(0)
+
+    dest_dir = root / assignment / ldac
+    if not dest_dir.exists():
+        typer.echo(f"ディレクトリ '{dest_dir.relative_to(root)}' が見つかりません", err=True)
+        raise typer.Exit(1)
+
+    shell = os.environ.get("SHELL", "/bin/sh")
+    os.chdir(dest_dir)
+    os.execvp(shell, [shell])
 
 
 @app.command()
