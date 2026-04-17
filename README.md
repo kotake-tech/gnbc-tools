@@ -20,6 +20,14 @@ GENIEEのbootcampで使う便利ツール
 uv tool install git+https://github.com/kotake-tech/gnbc-tools
 ```
 
+アップデートも同じコマンドでできます。
+
+バージョンを指定する場合は末尾に`@バージョンタグ`をつけてください。
+
+```sh
+uv tool install git+https://github.com/kotake-tech/gnbc-tools@v0.2.0
+```
+
 ## 使用方法
 
 > [!note]
@@ -37,7 +45,7 @@ uv tool install git+https://github.com/kotake-tech/gnbc-tools
   ```sh
   gnbc cd
   ```
-  このコマンドは新しいシェルを起動します。ルートに戻るには`exit`を実行してください
+  このコマンドは新しいシェルを起動します。ルートに戻るには`exit`を実行してください  
 - PRを作成する
   ```sh
   gnbc pr
