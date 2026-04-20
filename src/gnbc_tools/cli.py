@@ -5,6 +5,7 @@ import subprocess
 import webbrowser
 from datetime import date
 from pathlib import Path
+from typing import Optional
 from urllib.parse import quote
 
 import questionary
@@ -51,10 +52,10 @@ def get_repo_root() -> Path:
     )
 
 
-def get_assignments(root: Path) -> list[str]:
-    """MMdd_講義名 パターンのディレクトリを取得し、今日の日付で絞り込む。"""
-    today = date.today()
-    prefix = today.strftime("%m%d")
+def get_assignments(root: Path, date_filter: Optional[str] = None) -> list[str]:
+    """MMdd_講義名 パターンのディレクトリを取得し、日付で絞り込む。"""
+    if date_filter is None:
+        date_filter = date.today().strftime("%m%d")
 
     all_assignments = sorted(
         d.name
@@ -62,8 +63,8 @@ def get_assignments(root: Path) -> list[str]:
         if d.is_dir() and re.match(r"^\d{4}_", d.name)
     )
 
-    today_assignments = [a for a in all_assignments if a.startswith(prefix)]
-    return today_assignments if today_assignments else all_assignments
+    filtered = [a for a in all_assignments if a.startswith(date_filter)]
+    return filtered if filtered else all_assignments
 
 
 def get_instructor_dirs(assignment_dir: Path, ldac: str) -> list[Path]:
@@ -84,8 +85,8 @@ def _check_main_branch():
             raise typer.Exit(0)
 
 
-def _select_assignment(root: Path) -> str:
-    assignments = get_assignments(root)
+def _select_assignment(root: Path, date_filter: Optional[str] = None) -> str:
+    assignments = get_assignments(root, date_filter)
     if not assignments:
         typer.echo("課題ディレクトリが見つかりませんでした")
         raise typer.Exit(1)
@@ -144,14 +145,16 @@ def _do_cd(root: Path, assignment: str, ldac: str):
 
 
 @app.command()
-def init():
+def init(
+    date: Optional[str] = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
+):
     """ブランチ作成・テンプレコピー・ディレクトリ移動を一括で行う"""
     root = get_repo_root()
     ldac = get_ldac_name()
 
     _check_main_branch()
 
-    assignment = _select_assignment(root)
+    assignment = _select_assignment(root, date)
 
     branch_name = f"{assignment}/{ldac}"
     subprocess.run(["git", "checkout", "-b", branch_name], check=True)
@@ -162,14 +165,16 @@ def init():
 
 
 @app.command()
-def branch():
+def branch(
+    date: Optional[str] = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
+):
     """課題のブランチを作成する"""
     root = get_repo_root()
     ldac = get_ldac_name()
 
     _check_main_branch()
 
-    assignment = _select_assignment(root)
+    assignment = _select_assignment(root, date)
 
     branch_name = f"{assignment}/{ldac}"
     subprocess.run(["git", "checkout", "-b", branch_name], check=True)
@@ -177,7 +182,9 @@ def branch():
 
 
 @app.command()
-def cd():
+def cd(
+    date: Optional[str] = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
+):
     """課題のディレクトリに移動する (使用方法: gnbc cd)"""
     root = get_repo_root()
     ldac = get_ldac_name()
@@ -186,13 +193,15 @@ def cd():
     if "/" in current_branch:
         assignment = current_branch.rsplit("/", 1)[0]
     else:
-        assignment = _select_assignment(root)
+        assignment = _select_assignment(root, date)
 
     _do_cd(root, assignment, ldac)
 
 
 @app.command()
-def copy():
+def copy(
+    date: Optional[str] = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
+):
     """テンプレをコピーする"""
     root = get_repo_root()
     ldac = get_ldac_name()
@@ -201,7 +210,7 @@ def copy():
     if "/" in current_branch:
         assignment = current_branch.rsplit("/", 1)[0]
     else:
-        assignment = _select_assignment(root)
+        assignment = _select_assignment(root, date)
 
     _do_copy(root, assignment, ldac)
 

@@ -50,11 +50,19 @@ uv tool install git+https://github.com/kotake-tech/gnbc-tools@v0.2.0
     ```sh
     gnbc cd
     ```
-    このコマンドは新しいシェルを起動します。ルートに戻るには`exit`を実行してください  
+    このコマンドは新しいシェルを起動します。ルートに戻るには`exit`を実行してください
 - PRを作成する
   ```sh
   gnbc pr
   ```
+
+
+> [!tip]
+> `init`、`branch`、`copy`、`cd` コマンドは `--date`/`-d` オプションで課題の日付を指定できます。省略した場合は当日の日付で絞り込みます。
+> ```sh
+> gnbc init --date 0420
+> gnbc branch -d 0420
+> ``` 
 
 ## 仕様
 
