@@ -71,12 +71,7 @@ def get_instructor_dirs(assignment_dir: Path, ldac: str) -> list[Path]:
     return [d for d in assignment_dir.iterdir() if d.is_dir() and d.name != ldac]
 
 
-@app.command()
-def branch():
-    """課題のブランチを作成する"""
-    root = get_repo_root()
-    ldac = get_ldac_name()
-
+def _check_main_branch():
     current_branch = get_current_branch()
     if current_branch != "main":
         typer.echo(
@@ -88,6 +83,8 @@ def branch():
         if not proceed:
             raise typer.Exit(0)
 
+
+def _select_assignment(root: Path) -> str:
     assignments = get_assignments(root)
     if not assignments:
         typer.echo("課題ディレクトリが見つかりませんでした")
@@ -101,63 +98,10 @@ def branch():
     if assignment is None:
         raise typer.Exit(0)
 
-    branch_name = f"{assignment}/{ldac}"
-    subprocess.run(["git", "checkout", "-b", branch_name], check=True)
-    typer.echo(f"ブランチ '{branch_name}' を作成しました")
+    return assignment
 
 
-@app.command()
-def cd():
-    """課題のディレクトリに移動する (使用方法: gnbc cd)"""
-    root = get_repo_root()
-    ldac = get_ldac_name()
-
-    current_branch = get_current_branch()
-    if "/" in current_branch:
-        assignment = current_branch.rsplit("/", 1)[0]
-    else:
-        assignments = get_assignments(root)
-        if not assignments:
-            typer.echo("課題ディレクトリが見つかりませんでした", err=True)
-            raise typer.Exit(1)
-        assignment = questionary.select(
-            "課題を選択してください:",
-            choices=assignments,
-        ).ask()
-        if assignment is None:
-            raise typer.Exit(0)
-
-    dest_dir = root / assignment / ldac
-    if not dest_dir.exists():
-        typer.echo(f"ディレクトリ '{dest_dir.relative_to(root)}' が見つかりません", err=True)
-        raise typer.Exit(1)
-
-    shell = os.environ.get("SHELL", "/bin/sh")
-    os.chdir(dest_dir)
-    os.execvp(shell, [shell])
-
-
-@app.command()
-def copy():
-    """テンプレをコピーする"""
-    root = get_repo_root()
-    ldac = get_ldac_name()
-
-    current_branch = get_current_branch()
-    if "/" in current_branch:
-        assignment = current_branch.rsplit("/", 1)[0]
-    else:
-        assignments = get_assignments(root)
-        if not assignments:
-            typer.echo("課題ディレクトリが見つかりませんでした")
-            raise typer.Exit(1)
-        assignment = questionary.select(
-            "課題を選択してください:",
-            choices=assignments,
-        ).ask()
-        if assignment is None:
-            raise typer.Exit(0)
-
+def _do_copy(root: Path, assignment: str, ldac: str):
     assignment_dir = root / assignment
     if not assignment_dir.exists():
         typer.echo(f"課題ディレクトリ '{assignment}' が見つかりません")
@@ -186,6 +130,80 @@ def copy():
 
     shutil.copytree(template_dir, dest_dir)
     typer.echo(f"'{template_dir.name}' を '{dest_dir.relative_to(root)}' にコピーしました")
+
+
+def _do_cd(root: Path, assignment: str, ldac: str):
+    dest_dir = root / assignment / ldac
+    if not dest_dir.exists():
+        typer.echo(f"ディレクトリ '{dest_dir.relative_to(root)}' が見つかりません", err=True)
+        raise typer.Exit(1)
+
+    shell = os.environ.get("SHELL", "/bin/sh")
+    os.chdir(dest_dir)
+    os.execvp(shell, [shell])
+
+
+@app.command()
+def init():
+    """ブランチ作成・テンプレコピー・ディレクトリ移動を一括で行う"""
+    root = get_repo_root()
+    ldac = get_ldac_name()
+
+    _check_main_branch()
+
+    assignment = _select_assignment(root)
+
+    branch_name = f"{assignment}/{ldac}"
+    subprocess.run(["git", "checkout", "-b", branch_name], check=True)
+    typer.echo(f"ブランチ '{branch_name}' を作成しました")
+
+    _do_copy(root, assignment, ldac)
+    _do_cd(root, assignment, ldac)
+
+
+@app.command()
+def branch():
+    """課題のブランチを作成する"""
+    root = get_repo_root()
+    ldac = get_ldac_name()
+
+    _check_main_branch()
+
+    assignment = _select_assignment(root)
+
+    branch_name = f"{assignment}/{ldac}"
+    subprocess.run(["git", "checkout", "-b", branch_name], check=True)
+    typer.echo(f"ブランチ '{branch_name}' を作成しました")
+
+
+@app.command()
+def cd():
+    """課題のディレクトリに移動する (使用方法: gnbc cd)"""
+    root = get_repo_root()
+    ldac = get_ldac_name()
+
+    current_branch = get_current_branch()
+    if "/" in current_branch:
+        assignment = current_branch.rsplit("/", 1)[0]
+    else:
+        assignment = _select_assignment(root)
+
+    _do_cd(root, assignment, ldac)
+
+
+@app.command()
+def copy():
+    """テンプレをコピーする"""
+    root = get_repo_root()
+    ldac = get_ldac_name()
+
+    current_branch = get_current_branch()
+    if "/" in current_branch:
+        assignment = current_branch.rsplit("/", 1)[0]
+    else:
+        assignment = _select_assignment(root)
+
+    _do_copy(root, assignment, ldac)
 
 
 @app.command()
