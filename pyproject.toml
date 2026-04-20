@@ -1,6 +1,6 @@
 [project]
 name = "gnbc-tools"
-version = "0.2.0"
+version = "0.3.0"
 description = "GENIEEのbootcampで使う便利ツール"
 readme = "README.md"
 requires-python = ">=3.10"
