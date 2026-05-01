@@ -42,7 +42,6 @@ uv tool update gnbc-tools
   ```sh
   gnbc init
   ```
-  このコマンドはディレクトリ移動のために新しいシェルを起動します。ルートに戻るには`exit`を実行してください
   - 課題のブランチを作成する
     ```sh
     gnbc branch
