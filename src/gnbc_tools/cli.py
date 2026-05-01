@@ -76,13 +76,25 @@ def _check_main_branch():
     current_branch = get_current_branch()
     if current_branch != "main":
         typer.echo(
-            f"警告: 現在のブランチは '{current_branch}' です。"
-            " main に checkout して pull することを推奨します。",
+            f"警告: 現在のブランチは '{current_branch}' です。",
             err=True,
         )
-        proceed = questionary.confirm("このまま続行しますか?", default=False).ask()
-        if not proceed:
+        CHOICE_REBASE = "mainブランチをベースにして作成する(推奨)"
+        CHOICE_REBASE_AND_PULL = "mainブランチをベースに、pullしてから作成する"
+        CHOICE_CONTINUE = f"{current_branch}ブランチをベースにして作成する"
+        CHOICE_CANCEL = "キャンセル"
+        choice = questionary.select(
+            "どうしますか?",
+            choices=[CHOICE_REBASE, CHOICE_REBASE_AND_PULL, CHOICE_CONTINUE, CHOICE_CANCEL],
+            default=CHOICE_REBASE,
+        ).ask()
+        if choice is None or choice == CHOICE_CANCEL:
             raise typer.Exit(0)
+        if choice == CHOICE_REBASE:
+            subprocess.run(["git", "checkout", "main"], check=True)
+        elif choice == CHOICE_REBASE_AND_PULL:
+            subprocess.run(["git", "checkout", "main"], check=True)
+            subprocess.run(["git", "pull"], check=True)
 
 
 def _select_assignment(root: Path, date_filter: Optional[str] = None) -> str:
