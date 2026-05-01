@@ -215,6 +215,15 @@ def copy(
     _do_copy(root, assignment, ldac)
 
 
+def _is_branch_pushed(branch: str) -> bool:
+    result = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
+        capture_output=True,
+        text=True,
+    )
+    return result.returncode == 0
+
+
 @app.command()
 def pr():
     """PRを作成する"""
@@ -222,6 +231,14 @@ def pr():
     ldac = get_ldac_name()
 
     current_branch = get_current_branch()
+
+    if not _is_branch_pushed(current_branch):
+        typer.echo(f"ブランチ '{current_branch}' はリモートにpushされていません。")
+        push = questionary.confirm("リモートにpushしますか?", default=True).ask()
+        if not push:
+            raise typer.Exit(0)
+        subprocess.run(["git", "push", "-u", "origin", current_branch], check=True)
+
     pr_title = current_branch
 
     assignees: list[str] = []
