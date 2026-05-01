@@ -20,12 +20,6 @@ GENIEEのbootcampで使う便利ツール
 uv tool install git+https://github.com/kotake-tech/gnbc-tools
 ```
 
-特定のバージョンを指定してインストールしたい場合は末尾に`@バージョンタグ`をつけてください。
-
-```sh
-uv tool install git+https://github.com/kotake-tech/gnbc-tools@v0.2.0
-```
-
 ### アップデート
 
 ```sh
