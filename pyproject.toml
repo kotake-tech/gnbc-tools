@@ -18,3 +18,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gnbc_tools"]
+
+[dependency-groups]
+dev = ["ty>=0.0.0a1"]
+
+[tool.ty.environment]
+root = ["src"]

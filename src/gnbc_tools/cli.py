@@ -5,7 +5,6 @@ import subprocess
 import webbrowser
 from datetime import date
 from pathlib import Path
-from typing import Optional
 from urllib.parse import quote
 
 import questionary
@@ -52,7 +51,7 @@ def get_repo_root() -> Path:
     )
 
 
-def get_assignments(root: Path, date_filter: Optional[str] = None) -> list[str]:
+def get_assignments(root: Path, date_filter: str | None = None) -> list[str]:
     """MMdd_講義名 パターンのディレクトリを取得し、日付で絞り込む。"""
     if date_filter is None:
         date_filter = date.today().strftime("%m%d")
@@ -97,7 +96,7 @@ def _check_main_branch():
             subprocess.run(["git", "pull"], check=True)
 
 
-def _select_assignment(root: Path, date_filter: Optional[str] = None) -> str:
+def _select_assignment(root: Path, date_filter: str | None = None) -> str:
     assignments = get_assignments(root, date_filter)
     if not assignments:
         typer.echo("課題ディレクトリが見つかりませんでした")
@@ -158,7 +157,7 @@ def _do_cd(root: Path, assignment: str, ldac: str):
 
 @app.command()
 def init(
-    date: Optional[str] = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
+    date: str | None = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
 ):
     """ブランチ作成・テンプレコピー・ディレクトリ移動を一括で行う"""
     root = get_repo_root()
@@ -178,7 +177,7 @@ def init(
 
 @app.command()
 def branch(
-    date: Optional[str] = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
+    date: str | None = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
 ):
     """課題のブランチを作成する"""
     root = get_repo_root()
@@ -195,7 +194,7 @@ def branch(
 
 @app.command()
 def cd(
-    date: Optional[str] = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
+    date: str | None = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
 ):
     """課題のディレクトリに移動する (使用方法: gnbc cd)"""
     root = get_repo_root()
@@ -212,7 +211,7 @@ def cd(
 
 @app.command()
 def copy(
-    date: Optional[str] = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
+    date: str | None = typer.Option(None, "--date", "-d", help="課題絞り込みに使用する日付 (MMDD形式)"),
 ):
     """テンプレをコピーする"""
     root = get_repo_root()
